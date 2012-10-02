@@ -1,14 +1,12 @@
 /*
  * filetask.c
- *
- *  Created on: Feb 9, 2012
- *      Author: vikram
+ *Author: vikram
  */
 
 
 #include "filetask.h"
 
-//TODO ECONNRESET 54 = connection reset by the peer
+//TOLIST ECONNRESET 54 = connection reset by the peer
 static void calculate_chunks(int size);
 struct {
 	char *file_type;
@@ -26,7 +24,7 @@ int total_chunks;
 int partial_chunks;
 const char *folder = "cse_50026708";
 
-//TODO EPIPE 32 : BRoken pipe if client terminate the connection
+//TOLIST EPIPE 32 : BRoken pipe if client terminate the connection
 /*****************************************************************************************************
  *
  *****************************************************************************************************/
@@ -115,7 +113,7 @@ void* send_header(char *_file_name,int _sock_fd)
 	bzero((request_header *) header_ptr,sizeof(request_header));
 	strcpy(header_ptr->file_name,_file_name);
 	header_ptr->file_size = size;
-	header_ptr->is_available = 1;		//TODO: try to verify the availability of the file
+	header_ptr->is_available = 1;		//TOLIST: try to verify the availability of the file
 	return (header_ptr);
 }
 
