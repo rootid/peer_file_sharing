@@ -1,8 +1,6 @@
 /*
  * boot.h
- *
- *  Created on: Jan 25, 2012
- *      Author: vikram
+ * Author: vikram
  */
 
 #ifndef BOOT_H_
