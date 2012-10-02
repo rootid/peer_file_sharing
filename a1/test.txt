@@ -1,0 +1,102 @@
+I want to use VNC (Virtual Network Computing) in Linux to remote administer my various machines.
+
+1. Introduction
+
+1.1 What is VNC?
+
+VNC (Virtual Network Computing) is a remote display system which allows the user to view the desktop of a remote machine anywhere on the internet. It can be directed through SSH for security. It is a great tool for remote administration and thin clients. It does, however, have its drawbacks. It, unlike Tarentella (TM) or Citrix (TM), is not an application server. It also has the tendency to take more time refreshing over low-bandwidth links.
+
+1.2 Layout and content of this document
+
+This document is designed to be a quick-start guide to using VNC on Linux RedHat 8.0, but may be the same for Mandrake and/other distro's. The document will cover three basic configurations in detail. These configurations are: Linux Desktop on Windows, Windows Desktop on Linux, and Linux desktop on Linux. This document will also address the use of SSH to provide a secure VNC connection, allowing multiple users to view (not modify) a Windows desktop, and use VNC on other platforms. This is not designed to be comprehisive.
+
+2. Installing VNC on RedHat 8.0
+
+You should get the lates version of VNC Server and Client from http://www.realvnc.com/download.html. Read the INSTALL file included on the tar file.
+
+After the the tar file is installed there are some additional steps needed to configure VNC to use kde or GNOME as the desktop. VNC must be configured for each user on the Linux system, I will use the username "john" as the user I will configure VNC for (Note: each user has his/her own settings for VNC and also several different incidences of VNC can be run on Linux at the same time, so if you are viewing Linux desktops then it could work as a thin client server). The problem is that VNC is somewhat resource intensive (uses about half the resources of a full X server) so the more VNC instances you run the worse the preformance will be). First I log in as john and open a terminal window (you can also ssh or telnet to the machine that will be running vnc server). I first enter this command:
+
+vncserver
+Then I am prompted for the password to connect to the VNCserver. The password has to be at least six characters. Now the VNCserver is running but if you log in you will not have any window manager, so to add this first kill the server using this command:
+
+vncserver -kill :1
+If you have more that one VNCserver running then replace the 1 with the correct number of the VNCserver you want to kill (the number is given when you start the VNCserver).
+
+Now you need to edit the ~/.VNC/xstartup (you can use any text editor to do this). In this file uncomment (remove the # signs) from these lines:
+
+#!/bin/sh
+[ -r $HOME/.Xresources ]
+&& xrdb $HOME/.Xresources
+xsetroot -solid grey
+exec gnome-session &
+Now, when you login to VNC as a viewer, a default GNOME session will start.
+
+
+3. Installing VNC on Windows
+
+VNC for Windows is also available at http://www.realvnc.com/download.html. To install just unzip the VNCwin32-X.X.X.zip file then run setup.exe in the new directory that is created. You will need winzip or similar utlitiy for Windows in order to install it. Select the options during setup.
+
+4. Configuration and usage
+
+4.1 Scenario 1 - Linux Desktop on a Windows Client
+
+Because Linux is a multi-tasking, multi-user system you can have muliple instances of VNC running. Each user on a Linux machine can start a VNC session, and they don't have to worry about stepping on other user's toes. To do this first start the vncserver on Linux by issuing the command:
+
+vncserver -depth 16
+-geometry 1024x768
+You have to start the VNC server in 16 bit mode or GNOME will not work. You can use whatever values for geometry you want (800x600 is a good size too). More bandwidth is required for deeper color depths or larger geometries. After you start the vncserver something similar to this will be returned in terminal:
+
+New 'X' desktop is
+PC3323:1
+Starting applications
+specified in /root/.vnc/xstartup
+Log file is /root/.vnc/PC3323:1.log
+Now, on the Windows machine just double click the vncviewer icon and as the address put the hostname or IP address of the VNC Server with a :1 to specify display #1. If the hostname of the machine is not resolvable then you need to enter the <ipaddress>:1 to connect to the vncserver. Once you enter the correct address for the VNC server and the correct password then you will be presented with a GNOME desktop on your Windows desktop. For each new instance of the VNC server, the screen number (:1 in our example above) will be incremented by one. If I start another vncserver without stopping the first one I started the display number would be :2. To stop the VNC server just issue this command:
+
+vncserver -kill :<screen
+#>
+So to kill the vncserver in our example the command would be:
+
+vncserver -kill :1
+Only the user who started the VNC server can kill it. It is a good idea to clean up VNC servers for security reasons and to free up system resources.
+
+4.2 Scenario 2 - Making the VNC Server Come Up at Boot
+
+This requires an entry in the /etc/rc.d/rc.local file. You can call the vncserver directly but this will start it as root, which is a bad idea, so we are going to start it as a regular user. The user name we will use for this "user"; just replace all instances of "user" with the username on your machine. Basically we just add this line to the end of the rc.local file:
+
+su user -c "vncserver
+-depth 16 -geometry 1024x768"
+4.3 Scenario 3 - Windows Desktop on a Linux Client
+
+Unlike Linux, Windows is not a true multi-tasking, multi-user system, so only one instance of the VNC server can run on it. Also what ever changes are made from the VNC client are viewedon the local desktop. In other words a user sitting at the Windows machine can watch everything a remote user is doing through VNC, and vice versa.
+
+There are many different configuration setting for the vncserver in Windows. I will only cover the basics; for more information see the additional resources section. To start the server just go to the start button->programs->Vnc->Run WinVNC (app mode). This will start a vncserver. When the machine reboots the VNC server will not start automatically. To have the vncserver start automatically go to start->programs->Vnc->Administrative tools->Install WinVNC Service. Once the vncserver is running to connect to the server from Linux open a terminal window and type:
+
+vncviewer <ip or
+hostname >
+4.4 Scenario 4 - Allowing Multiple Users to View the Same Windows Desktop
+
+If one client is connected to winVNC and another user tries to connect the first user will be disconnected. To stop this, you would use the -shared option to vncviewer in Linux. For example, if I were viewed a Windows screen along with other clients I would type this command:
+
+vncviewer -shared <ip or hostname>
+User's can also be prevented from having any control over the Windows desktop too. To do this right click on the VNC icon in the system tray, then choose properties. Now check the box "Disable Remote Keyboard & Pointer" then click OK.
+
+4.5 Scenario 5 - Linux Desktop on Linux
+
+I don't really need to cover this scenario in much detail, but to start the vncserver on one machine just follow the instructions in scenario 1. To start the vncviewer on the client just follow the instructions on in scenario 2.
+
+5. Using SSH for a Secure VNC Connection
+
+
+SSH stands for Secure Shell. It uses public key cryptology to encript data sent between two computers. This makes it very hard for anyone to eavesdrop on the communication and steal important information, such as passwords. To use SSH with VNC we are going to setup ssh to listen on a port on the local machine then forward that port through the secure channel to the vncserver. The basic form of the command is this:
+
+ssh -L x:<hostname>:y <username>
+The command works like this: start an SSH connection to <hostname> (the vncserver), listen on port x on my local machine and forward all data to port y on the vncserver. VNC runs on port 59xx, where xx are replaced with the screen number. So, in our example from scenario 1 the vncserver is listening on port 5901. WinVNC listens on port 5900.
+
+One example applies to connection to a vncserver from Linux using SSH. Using the example from Scenario 1, we have a vncserver running on screen :1 on 134.199,40.64. Lets also add that user 'bob' has started the vncserver, so to setup ssh to forward the ports we would run this command on the Linux client:
+
+ssh -L
+5902:134.199.40.64:5901 bob
+when we hit enter we will be prompted for the password for bob. The vncserver has to be started prior to running the above comamnd. Enter the password and now the connection is up and the port is being forwarded. Now to start the vncviewer we use this command in another terminal window on the client machine:
+
+vncviewer localhost:2
