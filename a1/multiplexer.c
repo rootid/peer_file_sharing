@@ -1,8 +1,7 @@
 /*
  * multiplexer.c
  *
- *  Created on: Feb 2, 2012
- *      Author: vikram
+ * Author: vikram
  */
 
 #include "multiplexer.h"
