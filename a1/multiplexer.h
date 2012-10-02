@@ -1,8 +1,7 @@
 /*
  * multiplexer.h
  *
- *  Created on: Feb 3, 2012
- *      Author: vikram
+ * Author: vikram
  */
 
 #ifndef MULTIPLEXER_H_
