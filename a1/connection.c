@@ -1,8 +1,6 @@
 /*
  * connection.c
- *
- *  Created on: Feb 4, 2012
- *      Author: vikram
+ * Author: vikram
  */
 
 
